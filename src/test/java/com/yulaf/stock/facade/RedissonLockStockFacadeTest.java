@@ -15,10 +15,10 @@ import java.util.concurrent.Executors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-public class NamedLockStockFacadeTest {
+public class RedissonLockStockFacadeTest {
 
     @Autowired
-    private NamedLockStockFacade namedLockStockFacade;
+    private RedissonLockStockFacade redissonLockStockFacade;
 
     @Autowired
     private StockRepository stockRepository;
@@ -37,14 +37,14 @@ public class NamedLockStockFacadeTest {
     public void 동시에_100_요청() throws InterruptedException {
         int threadCount = 100;
 
-        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        ExecutorService executorService = Executors.newFixedThreadPool(32); // 멀티스레드 사용
 
         CountDownLatch countDownLatch = new CountDownLatch(threadCount);
 
         for (int i = 0; i < 100; i++) {
             executorService.submit(() -> {
                 try {
-                    namedLockStockFacade.decrease(1L, 1L);
+                    redissonLockStockFacade.decrease(1L, 1L);
                 } finally {
                     countDownLatch.countDown();
                 }

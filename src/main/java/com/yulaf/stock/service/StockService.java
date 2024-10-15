@@ -15,7 +15,7 @@ public class StockService {
         this.stockRepository = stockRepository;
     }
 
-    @Transactional
+//    @Transactional
     public synchronized void decrease(Long id, Long quantity) {
         // stock id와 감소시킬 stock 재고수
         // stock 조회
@@ -30,7 +30,9 @@ public class StockService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void decreaseNamedLockStock(Long id, Long quantity) {
+
         Stock stock = stockRepository.findById(id).orElseThrow();
+
         stock.decreaseQuantity(quantity);
 
         stockRepository.saveAndFlush(stock);

@@ -15,10 +15,10 @@ import java.util.concurrent.Executors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-public class NamedLockStockFacadeTest {
+public class LettuceLockStockFacadeTest {
 
     @Autowired
-    private NamedLockStockFacade namedLockStockFacade;
+    private LettuceLockStockFacade lettuceLockStockFacade;
 
     @Autowired
     private StockRepository stockRepository;
@@ -44,7 +44,9 @@ public class NamedLockStockFacadeTest {
         for (int i = 0; i < 100; i++) {
             executorService.submit(() -> {
                 try {
-                    namedLockStockFacade.decrease(1L, 1L);
+                    lettuceLockStockFacade.decrease(1L, 1L);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 } finally {
                     countDownLatch.countDown();
                 }
