@@ -2,8 +2,6 @@ package com.yulaf.stock.facade;
 
 import com.yulaf.stock.domain.Stock;
 import com.yulaf.stock.respository.StockRepository;
-import com.yulaf.stock.service.OptimisticLockStockService;
-import com.yulaf.stock.service.PessimisticLockStockService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,28 +34,28 @@ public class OptimisticLockStockFacadeTest {
     }
 
     @Test
-    public void 동시에_100_요청() throws InterruptedException {
+    public void 동시에_100개의요청() throws InterruptedException {
         int threadCount = 100;
+        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        CountDownLatch latch = new CountDownLatch(threadCount);
 
-        ExecutorService executorService = Executors.newFixedThreadPool(32); // 멀티스레드 사용
-
-        CountDownLatch countDownLatch = new CountDownLatch(threadCount);
-
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < threadCount; i++) {
             executorService.submit(() -> {
                 try {
                     optimisticLockStockFacade.decrease(1L, 1L);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 } finally {
-                    countDownLatch.countDown();
+                    latch.countDown();
                 }
             });
         }
 
-        countDownLatch.await();
+        latch.await();
 
         Stock stock = stockRepository.findById(1L).orElseThrow();
+
+        // 100 - (100 * 1) = 0
         assertEquals(0, stock.getQuantity());
     }
 }

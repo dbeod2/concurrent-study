@@ -1,13 +1,9 @@
 package com.yulaf.stock.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Stock {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -16,8 +12,19 @@ public class Stock {
 
     private Long quantity;
 
+    @Version
+    private Long version;
 
     public Stock() {
+
+    }
+
+    public void decreaseQuantity(Long quantity) {
+        if (this.quantity - quantity < 0) {
+            throw new RuntimeException("재고는 0 미만이 될 수없다.");
+        }
+
+        this.quantity -= quantity;
     }
 
     public Stock(Long productId, Long quantity) {
@@ -27,12 +34,5 @@ public class Stock {
 
     public Long getQuantity() {
         return quantity;
-    }
-
-    public void decreaseQuantity(Long quantity) {
-        if (this.quantity - quantity < 0) {
-            throw new RuntimeException("재고는 0 미만이 될 수없다.");
-        }
-        this.quantity -= quantity;
     }
 }
